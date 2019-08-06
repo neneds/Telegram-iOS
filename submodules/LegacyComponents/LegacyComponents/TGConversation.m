@@ -1112,7 +1112,7 @@
         _kickedFromChat = channel.kickedFromChat;
         self.kind = channel.leftChat || channel.kickedFromChat ? TGConversationKindTemporaryChannel : TGConversationKindPersistentChannel;
         _accessHash = channel.accessHash;
-        self.hasExplicitContent = channel.hasExplicitContent;
+        self.hasExplicitContent = false;//channel.hasExplicitContent;
         self.signaturesEnabled = channel.signaturesEnabled;
         self.restrictionReason = channel.restrictionReason;
         self.channelAdminRights = channel.channelAdminRights;
@@ -1178,15 +1178,16 @@
 }
 
 - (bool)hasExplicitContent {
-    return _flags & TGConversationFlagHasExplicitContent;
+    //return _flags & TGConversationFlagHasExplicitContent;
+    return false;
 }
 
 - (void)setHasExplicitContent:(bool)hasExplicitContent {
-    if (hasExplicitContent) {
-        _flags |= TGConversationFlagHasExplicitContent;
-    } else {
-        _flags &= ~TGConversationFlagHasExplicitContent;
-    }
+//    if (hasExplicitContent) {
+//        _flags |= TGConversationFlagHasExplicitContent;
+//    } else {
+//        _flags &= ~TGConversationFlagHasExplicitContent;
+//    }
 }
 
 - (bool)hasAdmins {

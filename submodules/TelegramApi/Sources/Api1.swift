@@ -9987,9 +9987,9 @@ public extension Api {
                     
                     break
                 case .inputReportReasonPornography:
-                    if boxed {
-                        buffer.appendInt32(777640226)
-                    }
+//                    if boxed {
+//                        buffer.appendInt32(777640226)
+//                    }
                     
                     break
                 case .inputReportReasonOther(let text):
@@ -10045,7 +10045,8 @@ public extension Api {
             return Api.ReportReason.inputReportReasonViolence
         }
         public static func parse_inputReportReasonPornography(_ reader: BufferReader) -> ReportReason? {
-            return Api.ReportReason.inputReportReasonPornography
+            //return Api.ReportReason.inputReportReasonPornography
+            return nil
         }
         public static func parse_inputReportReasonOther(_ reader: BufferReader) -> ReportReason? {
             var _1: String?

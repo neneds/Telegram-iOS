@@ -388,15 +388,17 @@ typedef enum {
 }
 
 - (bool)hasExplicitContent {
-    return _flags & TGConversationFlagHasExplicitContent;
+//    return _flags & TGConversationFlagHasExplicitContent;
+    return false;
 }
 
 - (void)setHasExplicitContent:(bool)hasExplicitContent {
-    if (hasExplicitContent) {
-        _flags |= TGConversationFlagHasExplicitContent;
-    } else {
-        _flags &= ~TGConversationFlagHasExplicitContent;
-    }
+//    if (hasExplicitContent) {
+//        _flags |= TGConversationFlagHasExplicitContent;
+//    } else {
+//        _flags &= ~TGConversationFlagHasExplicitContent;
+//    }
+    
 }
 
 - (bool)minimalRepresentation {

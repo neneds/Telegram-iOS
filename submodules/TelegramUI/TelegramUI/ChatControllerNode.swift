@@ -447,7 +447,7 @@ class ChatControllerNode: ASDisplayNode, UIScrollViewDelegate {
             if let (size, insets) = self.validEmptyNodeLayout {
                 emptyNode.updateLayout(interfaceState: self.chatPresentationInterfaceState, size: size, insets: insets, transition: .immediate)
             }
-            emptyNode.isHidden = self.restrictedNode != nil
+            emptyNode.isHidden = true//self.restrictedNode != nil
             self.emptyNode = emptyNode
             self.historyNodeContainer.supernode?.insertSubnode(emptyNode, aboveSubnode: self.historyNodeContainer)
             if animated {
@@ -508,9 +508,9 @@ class ChatControllerNode: ASDisplayNode, UIScrollViewDelegate {
                 containerNode.cornerRadius = 15.0
                 containerNode.addSubnode(self.backgroundNode)
                 containerNode.addSubnode(self.historyNodeContainer)
-                if let restrictedNode = self.restrictedNode {
-                    containerNode.addSubnode(restrictedNode)
-                }
+//                if let restrictedNode = self.restrictedNode {
+//                    containerNode.addSubnode(restrictedNode)
+//                }
                 self.containerNode = containerNode
                 self.scrollContainerNode?.addSubnode(containerNode)
                 self.navigationBar?.isHidden = true
@@ -537,9 +537,9 @@ class ChatControllerNode: ASDisplayNode, UIScrollViewDelegate {
                 containerNode.removeFromSupernode()
                 self.insertSubnode(self.backgroundNode, at: 0)
                 self.insertSubnode(self.historyNodeContainer, aboveSubnode: self.backgroundNode)
-                if let restrictedNode = self.restrictedNode {
-                    self.insertSubnode(restrictedNode, aboveSubnode: self.historyNodeContainer)
-                }
+//                if let restrictedNode = self.restrictedNode {
+//                    self.insertSubnode(restrictedNode, aboveSubnode: self.historyNodeContainer)
+//                }
                 self.navigationBar?.isHidden = false
             }
             if let overlayNavigationBar = self.overlayNavigationBar {
@@ -756,10 +756,10 @@ class ChatControllerNode: ASDisplayNode, UIScrollViewDelegate {
         
         transition.updateFrame(node: self.loadingNode, frame: contentBounds)
         
-        if let restrictedNode = self.restrictedNode {
-            transition.updateFrame(node: restrictedNode, frame: contentBounds)
-            restrictedNode.updateLayout(size: contentBounds.size, transition: transition)
-        }
+//        if let restrictedNode = self.restrictedNode {
+//            transition.updateFrame(node: restrictedNode, frame: contentBounds)
+//            restrictedNode.updateLayout(size: contentBounds.size, transition: transition)
+//        }
         
         let listViewCurve: ListViewAnimationCurve
         if curve == 7 {
@@ -1393,25 +1393,20 @@ class ChatControllerNode: ASDisplayNode, UIScrollViewDelegate {
                 }
             }
             
-            if let restrictionText = restrictionText {
-                if self.restrictedNode == nil {
-                    let restrictedNode = ChatRecentActionsEmptyNode(theme: chatPresentationInterfaceState.theme, chatWallpaper: chatPresentationInterfaceState.chatWallpaper)
-                    self.historyNodeContainer.supernode?.insertSubnode(restrictedNode, aboveSubnode: self.historyNodeContainer)
-                    self.restrictedNode = restrictedNode
-                }
-                self.restrictedNode?.setup(title: "", text: processedPeerRestrictionText(restrictionText))
-                self.historyNodeContainer.isHidden = true
-                self.navigateButtons.isHidden = true
-                self.loadingNode.isHidden = true
-                self.emptyNode?.isHidden = true
-            } else if let restrictedNode = self.restrictedNode {
-                self.restrictedNode = nil
-                restrictedNode.removeFromSupernode()
-                self.historyNodeContainer.isHidden = false
-                self.navigateButtons.isHidden = false
-                self.loadingNode.isHidden = false
-                self.emptyNode?.isHidden = false
-            }
+//            if let restrictionText = restrictionText {
+//                if self.restrictedNode == nil {
+//                    let restrictedNode = ChatRecentActionsEmptyNode(theme: chatPresentationInterfaceState.theme, chatWallpaper: chatPresentationInterfaceState.chatWallpaper)
+//                    self.historyNodeContainer.supernode?.insertSubnode(restrictedNode, aboveSubnode: self.historyNodeContainer)
+//                    self.restrictedNode = restrictedNode
+//                }
+//                self.restrictedNode?.setup(title: "", text: processedPeerRestrictionText(restrictionText))
+//                self.historyNodeContainer.isHidden = true
+//                self.navigateButtons.isHidden = true
+//                self.loadingNode.isHidden = true
+//                self.emptyNode?.isHidden = true
+//            } else if let restrictedNode = self.restrictedNode {
+//              
+//            }
             
             if let openStickersDisposable = self.openStickersDisposable {
                 if case .media = chatPresentationInterfaceState.inputMode {
