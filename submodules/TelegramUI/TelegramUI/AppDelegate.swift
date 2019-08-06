@@ -1088,7 +1088,11 @@ final class SharedApplicationContext {
         })
         
         let pushRegistry = PKPushRegistry(queue: .main)
-        pushRegistry.desiredPushTypes = Set([.voIP])
+        if #available(iOS 9.0, *) {
+            pushRegistry.desiredPushTypes = Set([.voIP])
+        } else {
+            // Fallback on earlier versions
+        }
         self.pushRegistry = pushRegistry
         pushRegistry.delegate = self
         
@@ -1311,10 +1315,14 @@ final class SharedApplicationContext {
     }
 
     public func pushRegistry(_ registry: PKPushRegistry, didUpdate credentials: PKPushCredentials, for type: PKPushType) {
-        if case PKPushType.voIP = type {
-            Logger.shared.log("App \(self.episodeId)", "pushRegistry credentials: \(credentials.token as NSData)")
+        if #available(iOS 9.0, *) {
+            if case PKPushType.voIP = type {
+                Logger.shared.log("App \(self.episodeId)", "pushRegistry credentials: \(credentials.token as NSData)")
+                
+                self.voipTokenPromise.set(.single(credentials.token))
+            }
+        } else {
             
-            self.voipTokenPromise.set(.single(credentials.token))
         }
     }
     
@@ -1324,9 +1332,13 @@ final class SharedApplicationContext {
         |> deliverOnMainQueue).start(next: { sharedApplicationContext in
             sharedApplicationContext.wakeupManager.allowBackgroundTimeExtension(timeout: 4.0)
             
-            if case PKPushType.voIP = type {
-                Logger.shared.log("App \(self.episodeId)", "pushRegistry payload: \(payload.dictionaryPayload)")
-                sharedApplicationContext.notificationManager.addEncryptedNotification(payload.dictionaryPayload)
+            if #available(iOS 9.0, *) {
+                if case PKPushType.voIP = type {
+                    Logger.shared.log("App \(self.episodeId)", "pushRegistry payload: \(payload.dictionaryPayload)")
+                    sharedApplicationContext.notificationManager.addEncryptedNotification(payload.dictionaryPayload)
+                }
+            } else {
+               
             }
         })
     }

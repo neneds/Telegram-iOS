@@ -10,23 +10,25 @@ public enum StatusBarStyle {
     
     public init(systemStyle: UIStatusBarStyle) {
         switch systemStyle {
-            case .default:
-                self = .Black
-            case .lightContent:
-                self = .White
-            case .blackOpaque:
-                self = .Black
+        case .default:
+            self = .Black
+        case .lightContent:
+            self = .White
+        case .blackOpaque:
+            self = .Black
+        case .darkContent:
+            self = .Black
         }
     }
     
     public var systemStyle: UIStatusBarStyle {
         switch self {
-            case .Black:
-                return .default
-            case .White:
-                return .lightContent
-            default:
-                return .default
+        case .Black:
+            return .default
+        case .White:
+            return .lightContent
+        default:
+            return .default
         }
     }
 }
@@ -147,135 +149,135 @@ private class StatusBarItemNode: ASDisplayNode {
 
 private func tintStatusBarItem(_ context: DrawingContext, type: StatusBarItemType, style: StatusBarStyle) {
     switch type {
-        case .Battery:
-            let minY = 0
-            let minX = 0
-            let maxY = Int(context.size.height * context.scale)
-            let maxX = Int(context.size.width * context.scale)
-            if minY < maxY && minX < maxX {
-                let basePixel = context.bytes.assumingMemoryBound(to: UInt32.self)
-                let pixelsPerRow = context.bytesPerRow / 4
-                
-                let midX = (maxX + minX) / 2
-                let midY = (maxY + minY) / 2
-                let baseMidRow = basePixel + pixelsPerRow * midY
-                var baseX = minX
-                while baseX < maxX {
-                    let pixel = baseMidRow + baseX
-                    let alpha = pixel.pointee & 0xff000000
-                    if alpha != 0 {
-                        break
-                    }
-                    baseX += 1
+    case .Battery:
+        let minY = 0
+        let minX = 0
+        let maxY = Int(context.size.height * context.scale)
+        let maxX = Int(context.size.width * context.scale)
+        if minY < maxY && minX < maxX {
+            let basePixel = context.bytes.assumingMemoryBound(to: UInt32.self)
+            let pixelsPerRow = context.bytesPerRow / 4
+            
+            let midX = (maxX + minX) / 2
+            let midY = (maxY + minY) / 2
+            let baseMidRow = basePixel + pixelsPerRow * midY
+            var baseX = minX
+            while baseX < maxX {
+                let pixel = baseMidRow + baseX
+                let alpha = pixel.pointee & 0xff000000
+                if alpha != 0 {
+                    break
+                }
+                baseX += 1
+            }
+            
+            while baseX < maxX {
+                let pixel = baseMidRow + baseX
+                let alpha = pixel.pointee & 0xff000000
+                if alpha == 0 {
+                    break
+                }
+                baseX += 1
+            }
+            
+            while baseX < maxX {
+                let pixel = baseMidRow + baseX
+                let alpha = pixel.pointee & 0xff000000
+                if alpha != 0 {
+                    break
+                }
+                baseX += 1
+            }
+            
+            var targetX = baseX
+            while targetX < maxX {
+                let pixel = baseMidRow + targetX
+                let alpha = pixel.pointee & 0xff000000
+                if alpha == 0 {
+                    break
                 }
                 
-                while baseX < maxX {
-                    let pixel = baseMidRow + baseX
-                    let alpha = pixel.pointee & 0xff000000
-                    if alpha == 0 {
-                        break
-                    }
-                    baseX += 1
+                targetX += 1
+            }
+            
+            let batteryColor = (baseMidRow + baseX + 2).pointee
+            let batteryR = (batteryColor >> 16) & 0xff
+            let batteryG = (batteryColor >> 8) & 0xff
+            let batteryB = batteryColor & 0xff
+            
+            var baseY = minY
+            while baseY < maxY {
+                let baseRow = basePixel + pixelsPerRow * baseY
+                let pixel = baseRow + midX
+                let alpha = pixel.pointee & 0xff000000
+                if alpha != 0 {
+                    break
                 }
-                
-                while baseX < maxX {
-                    let pixel = baseMidRow + baseX
-                    let alpha = pixel.pointee & 0xff000000
-                    if alpha != 0 {
-                        break
-                    }
-                    baseX += 1
+                baseY += 1
+            }
+            
+            var targetY = maxY - 1
+            while targetY >= baseY {
+                let baseRow = basePixel + pixelsPerRow * targetY
+                let pixel = baseRow + midX
+                let alpha = pixel.pointee & 0xff000000
+                if alpha != 0 {
+                    break
                 }
-                
-                var targetX = baseX
-                while targetX < maxX {
-                    let pixel = baseMidRow + targetX
-                    let alpha = pixel.pointee & 0xff000000
-                    if alpha == 0 {
-                        break
-                    }
-                    
-                    targetX += 1
-                }
-                
-                let batteryColor = (baseMidRow + baseX + 2).pointee
-                let batteryR = (batteryColor >> 16) & 0xff
-                let batteryG = (batteryColor >> 8) & 0xff
-                let batteryB = batteryColor & 0xff
-                
-                var baseY = minY
-                while baseY < maxY {
-                    let baseRow = basePixel + pixelsPerRow * baseY
-                    let pixel = baseRow + midX
-                    let alpha = pixel.pointee & 0xff000000
-                    if alpha != 0 {
-                        break
-                    }
-                    baseY += 1
-                }
-                
-                var targetY = maxY - 1
-                while targetY >= baseY {
-                    let baseRow = basePixel + pixelsPerRow * targetY
-                    let pixel = baseRow + midX
-                    let alpha = pixel.pointee & 0xff000000
-                    if alpha != 0 {
-                        break
-                    }
-                    targetY -= 1
-                }
-                
                 targetY -= 1
+            }
+            
+            targetY -= 1
+            
+            let baseColor: UInt32
+            switch style {
+            case .Black, .Ignore, .Hide:
+                baseColor = 0x000000
+            case .White:
+                baseColor = 0xffffff
+            }
+            
+            let baseR = (baseColor >> 16) & 0xff
+            let baseG = (baseColor >> 8) & 0xff
+            let baseB = baseColor & 0xff
+            
+            var pixel = context.bytes.assumingMemoryBound(to: UInt32.self)
+            let end = context.bytes.advanced(by: context.length).assumingMemoryBound(to: UInt32.self)
+            while pixel != end {
+                let alpha = (pixel.pointee & 0xff000000) >> 24
                 
-                let baseColor: UInt32
-                switch style {
-                    case .Black, .Ignore, .Hide:
-                        baseColor = 0x000000
-                    case .White:
-                        baseColor = 0xffffff
-                }
+                let r = (baseR * alpha) / 255
+                let g = (baseG * alpha) / 255
+                let b = (baseB * alpha) / 255
                 
-                let baseR = (baseColor >> 16) & 0xff
-                let baseG = (baseColor >> 8) & 0xff
-                let baseB = baseColor & 0xff
+                pixel.pointee = (alpha << 24) | (r << 16) | (g << 8) | b
                 
-                var pixel = context.bytes.assumingMemoryBound(to: UInt32.self)
-                let end = context.bytes.advanced(by: context.length).assumingMemoryBound(to: UInt32.self)
-                while pixel != end {
-                    let alpha = (pixel.pointee & 0xff000000) >> 24
-                    
-                    let r = (baseR * alpha) / 255
-                    let g = (baseG * alpha) / 255
-                    let b = (baseB * alpha) / 255
-                    
-                    pixel.pointee = (alpha << 24) | (r << 16) | (g << 8) | b
-                    
-                    pixel += 1
-                }
-                
-                let whiteColor: UInt32 = 0xffffffff as UInt32
-                let blackColor: UInt32 = 0xff000000 as UInt32
-                if batteryColor != whiteColor && batteryColor != blackColor {
-                    var y = baseY + 2
-                    while y < targetY {
-                        let baseRow = basePixel + pixelsPerRow * y
-                        var x = baseX
-                        while x < targetX {
-                            let pixel = baseRow + x
-                            let alpha = (pixel.pointee >> 24) & 0xff
-                            
-                            let r = (batteryR * alpha) / 255
-                            let g = (batteryG * alpha) / 255
-                            let b = (batteryB * alpha) / 255
-                            
-                            pixel.pointee = (alpha << 24) | (r << 16) | (g << 8) | b
-                            
-                            x += 1
-                        }
-                        y += 1
+                pixel += 1
+            }
+            
+            let whiteColor: UInt32 = 0xffffffff as UInt32
+            let blackColor: UInt32 = 0xff000000 as UInt32
+            if batteryColor != whiteColor && batteryColor != blackColor {
+                var y = baseY + 2
+                while y < targetY {
+                    let baseRow = basePixel + pixelsPerRow * y
+                    var x = baseX
+                    while x < targetX {
+                        let pixel = baseRow + x
+                        let alpha = (pixel.pointee >> 24) & 0xff
+                        
+                        let r = (batteryR * alpha) / 255
+                        let g = (batteryG * alpha) / 255
+                        let b = (batteryB * alpha) / 255
+                        
+                        pixel.pointee = (alpha << 24) | (r << 16) | (g << 8) | b
+                        
+                        x += 1
                     }
+                    y += 1
                 }
             }
+        }
     case .Activity:
         break
     case .Generic:
@@ -284,10 +286,10 @@ private func tintStatusBarItem(_ context: DrawingContext, type: StatusBarItemTyp
         
         let baseColor: UInt32
         switch style {
-            case .Black, .Ignore, .Hide:
-                baseColor = 0x000000
-            case .White:
-                baseColor = 0xffffff
+        case .Black, .Ignore, .Hide:
+            baseColor = 0x000000
+        case .White:
+            baseColor = 0xffffff
         }
         
         let baseR = (baseColor >> 16) & 0xff
